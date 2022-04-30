@@ -1,14 +1,48 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.parchmentmc.org' }
+    }
+}
+
 plugins {
     id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
     id 'idea'
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+
+tasks.build.dependsOn(tasks.findByName("shadowJar"))
+
+configurations {
+    shadow
+    implementation.extendsFrom(shadow)
+}
+shadowJar {
+    configurations = [project.configurations.shadow]
 }
 
 archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
+repositories {
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io"
+    }
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-1.18.2:${parchment_version}@zip")
+    }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation project(":Common")
@@ -49,6 +83,10 @@ tasks.withType(JavaCompile) {
     source(project(":Common").sourceSets.main.allSource)
 }
 
+tasks.withType(Javadoc) {
+    failOnError false
+}
+
 jar {
     from("LICENSE") {
         rename { "${it}_${mod_name}" }
@@ -70,4 +108,8 @@ publishing {
             url "file://" + System.getenv("local_maven")
         }
     }
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
 }

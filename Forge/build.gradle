@@ -2,20 +2,47 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 
+tasks.build.dependsOn(tasks.findByName("shadowJar"))
+
+configurations {
+    shadow
+    implementation.extendsFrom(shadow)
+
+    library
+    implementation.extendsFrom library
+}
+
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 archivesBaseName = "${mod_name}-forge-${minecraft_version}"
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+}
 
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
@@ -25,7 +52,7 @@ mixin {
 }
 
 minecraft {
-    mappings channel: 'official', version: minecraft_version
+    mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
 
     if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
         // This location is hardcoded in Forge and can not be changed.
@@ -40,6 +67,10 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Client'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+            def output = sourceSets.main.output;
+            def commonOutput = project(":Common").sourceSets.main.output;
+            environment("MOD_CLASSES", [output.classesDirs.asPath, output.resourcesDir.path, commonOutput.classesDirs.asPath, commonOutput.resourcesDir.path].join(";"))
+
             mods {
                 modClientRun {
                     source sourceSets.main
@@ -53,6 +84,10 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Server'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+            def output = sourceSets.main.output;
+            def commonOutput = project(":Common").sourceSets.main.output;
+            environment("MOD_CLASSES", [output.classesDirs.asPath, output.resourcesDir.path, commonOutput.classesDirs.asPath, commonOutput.resourcesDir.path].join(";"))
+
             mods {
                 modServerRun {
                     source sourceSets.main
@@ -67,6 +102,10 @@ minecraft {
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             taskName 'Data'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
+            def output = sourceSets.main.output;
+            def commonOutput = project(":Common").sourceSets.main.output;
+            environment("MOD_CLASSES", [output.classesDirs.asPath, output.resourcesDir.path, commonOutput.classesDirs.asPath, commonOutput.resourcesDir.path].join(";"))
+
             mods {
                 modDataRun {
                     source sourceSets.main
@@ -82,7 +121,7 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":Common")
-    annotationProcessor 'org.spongepowered:mixin:0.8.4-SNAPSHOT:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 tasks.withType(JavaCompile) {
