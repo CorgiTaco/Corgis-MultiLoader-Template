@@ -17,8 +17,8 @@ public class ExampleForgeMixin {
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
         
-        Constants.LOG.info("This line is printed by an example mod mixin from Forge!");
-        Constants.LOG.info(ModList.get()
+        Constants.LOGGER.info("This line is printed by an example mod mixin from Forge!");
+        Constants.LOGGER.info(ModList.get()
                 .getMods()
                 .stream()
                 .map(IModInfo::getModId)

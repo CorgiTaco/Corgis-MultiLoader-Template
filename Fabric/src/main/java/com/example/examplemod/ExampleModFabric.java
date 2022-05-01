@@ -1,9 +1,10 @@
 package com.example.examplemod;
 
+import com.example.examplemod.network.FabricNetworkHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 
-public class ExampleMod implements ModInitializer {
+public class ExampleModFabric implements ModInitializer {
     
     @Override
     public void onInitialize() {
@@ -13,8 +14,9 @@ public class ExampleMod implements ModInitializer {
         // project.
 
         // Use Fabric to bootstrap the Common mod.
-        Constants.LOG.info("Hello Fabric world!");
+        Constants.LOGGER.info("Hello Fabric world!");
         CommonClass.init();
+        FabricNetworkHandler.init();
         
         // Some code like events require special initialization from the
         // loader specific code.

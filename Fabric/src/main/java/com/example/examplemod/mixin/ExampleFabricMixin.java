@@ -18,8 +18,8 @@ public class ExampleFabricMixin {
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
         
-        Constants.LOG.info("This line is printed by an example mod mixin from Fabric!");
-        Constants.LOG.info(FabricLoader.getInstance()
+        Constants.LOGGER.info("This line is printed by an example mod mixin from Fabric!");
+        Constants.LOGGER.info(FabricLoader.getInstance()
                 .getAllMods()
                 .stream()
                 .map(ModContainer::getMetadata)

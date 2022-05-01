@@ -7,5 +7,5 @@ public class Constants {
 
 	public static final String MOD_ID = "multiloader";
 	public static final String MOD_NAME = "Example Mod";
-	public static final Logger LOG = LogManager.getLogger(MOD_NAME);
+	public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 }
