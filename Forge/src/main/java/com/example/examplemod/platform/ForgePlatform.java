@@ -1,13 +1,15 @@
 package com.example.examplemod.platform;
 
 import com.example.examplemod.network.ForgeNetworkHandler;
-import com.example.examplemod.network.S2CPacket;
-import com.example.examplemod.platform.services.IPlatformHelper;
+import com.example.examplemod.network.Packet;
+import com.example.examplemod.platform.services.ModPlatform;
+import com.google.auto.service.AutoService;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 
-public class ForgePlatformHelper implements IPlatformHelper {
+@AutoService(ModPlatform.class)
+public class ForgePlatform implements ModPlatform {
 
     @Override
     public String getPlatformName() {
@@ -25,7 +27,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public <P extends S2CPacket> void sendToClient(ServerPlayer player, P packet) {
+    public <P extends Packet> void sendToClient(ServerPlayer player, P packet) {
         ForgeNetworkHandler.sendToPlayer(player, packet);
+    }
+
+    @Override
+    public <P extends Packet> void sendToServer(P packet) {
+        ForgeNetworkHandler.sendToServer(packet);
     }
 }

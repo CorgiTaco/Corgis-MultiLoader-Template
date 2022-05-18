@@ -1,11 +1,11 @@
 package com.example.examplemod.platform.services;
 
-import com.example.examplemod.network.S2CPacket;
+import com.example.examplemod.network.Packet;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 
-public interface IPlatformHelper {
+public interface ModPlatform {
 
     /**
      * Gets the name of the current platform
@@ -29,11 +29,13 @@ public interface IPlatformHelper {
      */
     boolean isDevelopmentEnvironment();
 
-    <P extends S2CPacket> void sendToClient(ServerPlayer player, P packet);
+    <P extends Packet> void sendToClient(ServerPlayer player, P packet);
 
-    default <P extends S2CPacket> void sendToAllClients(List<ServerPlayer> players, P packet) {
+    default <P extends Packet> void sendToAllClients(List<ServerPlayer> players, P packet) {
         for (ServerPlayer player : players) {
             sendToClient(player, packet);
         }
     }
+
+    <P extends Packet> void sendToServer(P packet);
 }

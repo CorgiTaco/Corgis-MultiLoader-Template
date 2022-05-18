@@ -1,13 +1,13 @@
 package com.example.examplemod.platform;
 
 import com.example.examplemod.Constants;
-import com.example.examplemod.platform.services.IPlatformHelper;
+import com.example.examplemod.platform.services.ModPlatform;
 
 import java.util.ServiceLoader;
 
 public class Services {
 
-    public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
+    public static final ModPlatform PLATFORM = load(ModPlatform.class);
 
     public static <T> T load(Class<T> clazz) {
 

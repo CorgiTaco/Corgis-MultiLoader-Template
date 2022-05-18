@@ -1,3 +1,18 @@
+plugins {
+    id 'java'
+    id 'com.matyrobbrt.mc.registrationutils' version '0.2.3'
+}
+
+registrationUtils {
+    group 'com.example.examplemod'
+    projects {
+        Common { type 'common'; project ':Common' }
+        Fabric { type 'fabric'; project ':Fabric' }
+        Forge { type 'forge'; project ':Forge' }
+    }
+}
+
+
 subprojects {
     
     apply plugin: 'java'
@@ -5,6 +20,12 @@ subprojects {
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
     java.withJavadocJar()
+
+    dependencies {
+        compileOnly group:'com.google.auto.service', name:'auto-service', version:'1.0.1'
+        annotationProcessor group:'com.google.auto.service', name:'auto-service', version:'1.0.1'
+        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    }
         
     jar {
         manifest {
